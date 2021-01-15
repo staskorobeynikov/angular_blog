@@ -20,4 +20,36 @@ export class PostsService {
           };
       }));
   }
+
+  getAll(): Observable<Post[]> {
+    return this.http.get(`${environment.fdDbUrl}/posts.json`)
+      .pipe(map((response: {[key: string]: any}) => {
+        return Object
+          .keys(response)
+          .map(key => ({
+            ...response[key],
+            id: key,
+            date: new Date(response[key].date)
+          }));
+      }));
+  }
+
+  getById(id: string): Observable<Post> {
+    return this.http.get<Post>(`${environment.fdDbUrl}/posts/${id}.json`)
+      .pipe(map((post: Post) => {
+        return {
+          ...post,
+          id,
+          date: new Date(post.date)
+        };
+      }));
+  }
+
+  remove(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.fdDbUrl}/posts/${id}.json`);
+  }
+
+  update(post: Post): Observable<Post> {
+    return this.http.patch<Post>(`${environment.fdDbUrl}/posts/${post.id}.json`, post);
+  }
 }
